@@ -10,7 +10,7 @@ Skill này cung cấp kiến thức và hướng dẫn tiêu chuẩn để vận
 ## 📂 Kiến trúc dự án
 - **File chính:** `scripts/OpenFBV2POST.py` - Chứa toàn bộ logic đọc sheet, khởi tạo Chrome driver, điều khiển bằng Selenium để đăng ảnh và chữ.
 - **Cấu hình Google:** `prn8n-457809-2aa9c8e5f6d4.json` - Service account key để kết nối Google Sheets API.
-- **Thư mục Chrome Profile:** `facebook-chrome-profile/` - Lưu trữ session đăng nhập để không phải nhập lại mật khẩu các lần sau.
+- **Thư mục Chrome Profile:** `facebook-chrome-profile/` - Được lấy từ **thư mục hiện hành (working directory)** để lưu trữ session đăng nhập. Tính năng này giúp bạn dễ dàng chạy và quản lý profile theo từng thư mục hoặc dự án riêng biệt.
 - **Thư mục ảnh:** `images/` - Chứa file ảnh để upload lên bài viết.
 
 ## ⚙️ Yêu cầu & Cài đặt môi trường

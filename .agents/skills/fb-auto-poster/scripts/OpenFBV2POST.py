@@ -52,7 +52,7 @@ def find_chrome_binary():
 CHROME_BINARY = find_chrome_binary()
 
 # Đường dẫn tự động nhận dạng cho từng máy
-PROFILE_ROOT = os.path.join(BASE_DIR, "facebook-chrome-profile")
+PROFILE_ROOT = os.path.join(os.getcwd(), "facebook-chrome-profile")
 FB_URL = "https://www.facebook.com"
 
 SHEET_ID = "1txOKAVBAJhWyWNr4rxjs7zn5GKJvJKrQDmISNur-TVg"
