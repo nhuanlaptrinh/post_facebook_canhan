@@ -1,5 +1,5 @@
 ---
-name: Facebook Auto Poster Tool
+name: fb-auto-poster
 description: Kỹ năng quản lý, thiết lập và chạy dự án tự động đăng bài lên Facebook cá nhân thông qua Python Selenium, Google Sheets, và Windows Task Scheduler.
 ---
 
