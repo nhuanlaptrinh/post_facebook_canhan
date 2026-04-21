@@ -35,6 +35,7 @@ Dự án hỗ trợ hai chế độ chạy chính:
    
 2. **Chế độ chạy tự động bình thường:**
    Tự động phát hiện phiên đăng nhập, đọc bài viết có trạng thái `UNAPPROVED` (chưa duyệt/chưa đăng) từ Google Sheet, thực hiện đăng lên Facebook và đánh dấu lại thành `APPROVED`. (Chỉ đăng 1 bài mỗi lần chạy).
+   *(Lưu ý: Nếu chưa có Chrome Profile, lệnh này sẽ tự động chuyển sang Chế độ Đăng nhập lần đầu giúp bạn).*
    ```powershell
    python .agents\skills\fb-auto-poster\scripts\OpenFBV2POST.py
    ```
@@ -51,16 +52,17 @@ powershell -c "Start-Process powershell -Verb runAs -ArgumentList '-ExecutionPol
 Khi Agent chạy lệnh này qua `run_command`, người dùng sẽ nhận được popup UAC trên màn hình. Khi người dùng bấm "Yes", đoạn script cài đặt lịch (ví dụ `setup_4mins.ps1`) sẽ được chạy thành công bằng quyền Admin!
 
 ### 1. Nguyên tắc cốt lõi khi chạy ngầm
-- Sử dụng **đường dẫn tuyệt đối** tới file thực thi Python trong môi trường ảo (ví dụ: `D:\05. Facebook CN\Facebook_CaNhan\venv\Scripts\python.exe`).
+- Hệ thống làm việc lấy chuẩn từ **thư mục hiện hành** (Working Directory) để lưu profile trình duyệt (`facebook-chrome-profile`), nhận diện ảnh tải lên (`images`) cũng như cấu hình bảo mật Google.
+- **Lưu ý quan trọng**: Đảm bảo bạn đã đặt file cấu hình Google Credential JSON (VD: `prn8n-xxxx.json`) vào ngay chính thư mục gốc mà bạn thiết lập làm Working Directory.
+- Sử dụng **đường dẫn tuyệt đối** tới file thực thi Python trong môi trường ảo (ví dụ: `C:\path\to\your\venv\Scripts\python.exe`).
 - Bắt buộc phải thiết lập **thư mục làm việc** (Start in/Working Directory) để script đọc đúng cấu hình.
-- Xuất log chạy ngầm nếu cần gỡ lỗi.
 
 ### 2. Cài đặt tự động bằng PowerShell
-Mở Windows PowerShell với quyền Administrator và chạy đoạn lệnh sau (tự động tạo một Task chạy vào lúc 8h sáng mỗi ngày). Hãy cập nhật đường dẫn nếu vị trí dự án của bạn thay đổi:
+Mở Windows PowerShell tại thư mục làm việc hiện hành (nơi chứa file cấu hình) với quyền Administrator và chạy lệnh sau:
 
 ```powershell
-# Thiết lập các đường dẫn cơ bản
-$projectDir = "D:\05. Facebook CN\Facebook_CaNhan"
+# Thiết lập linh hoạt lấy trực tiếp đường dẫn thư mục hiện tại
+$projectDir = (Get-Location).Path
 $pythonExe = "$projectDir\venv\Scripts\python.exe"
 $scriptFile = ".agents\skills\fb-auto-poster\scripts\OpenFBV2POST.py"
 
@@ -76,9 +78,9 @@ Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "Auto Post Fa
 Nếu không dùng PowerShell, bạn tạo task với các cấu hình sau:
 - **Trigger:** Daily, thiết lập thời gian mong muốn (vd: 08:00 AM).
 - **Action:** Start a program.
-  - *Program/script:* `D:\05. Facebook CN\Facebook_CaNhan\venv\Scripts\python.exe`
+  - *Program/script:* `<Đường_dẫn_tới_thư_mục_của_bạn>\venv\Scripts\python.exe`
   - *Add arguments:* `.agents\skills\fb-auto-poster\scripts\OpenFBV2POST.py`
-  - *Start in:* `D:\05. Facebook CN\Facebook_CaNhan\`
+  - *Start in:* `<Đường_dẫn_tới_thư_mục_của_bạn>\`
 ## 🐞 Xử lý lỗi (Troubleshooting)
 
 - **Lỗi không click được Upload Ảnh:** Do Facebook cập nhật giao diện modal. Code hiện tại dùng trick kích hoạt `input[type='file']` bị ẩn thông qua Javascript.

@@ -25,17 +25,8 @@ from selenium.common.exceptions import (
     StaleElementReferenceException,
 )
 
-# Lấy thư mục gốc (áp dụng cho cả file .py và khi build ra file .exe)
-def get_base_dir():
-    if getattr(sys, 'frozen', False):
-        return os.path.dirname(sys.executable)
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    # Nếu file nằm sâu trong cấu trúc skill của agent, lùi ra ngoài 4 bậc để lấy thư mục gốc dự án
-    if "fb-auto-poster" in current_dir and ".agents" in current_dir:
-        return os.path.abspath(os.path.join(current_dir, "..", "..", "..", ".."))
-    return current_dir
-
-BASE_DIR = get_base_dir()
+# Lấy thư mục hiện hành thay vì thư mục chứa file, để chạy mọi nơi linh hoạt
+BASE_DIR = os.getcwd()
 
 # Tự động tìm Google Chrome trên Windows
 def find_chrome_binary():
@@ -217,8 +208,20 @@ def upload_image_direct(driver, img_path):
 def validate_environment():
     if not os.path.exists(CHROME_BINARY):
         raise FileNotFoundError(f"Không tìm thấy Chrome binary: {CHROME_BINARY}")
+        
+    # Tạo sẵn các thư mục cần thiết tại thư mục hiện hành
     if not os.path.isdir(PROFILE_ROOT):
-        raise FileNotFoundError(f"Không tìm thấy Chrome profile: {PROFILE_ROOT}")
+        os.makedirs(PROFILE_ROOT, exist_ok=True)
+    
+    images_dir = os.path.join(BASE_DIR, "images")
+    if not os.path.isdir(images_dir):
+        os.makedirs(images_dir, exist_ok=True)
+        
+    # Nhắc nhở người dùng nếu thiếu file khóa JSON Google Sheets
+    if not os.path.isfile(CREDENTIALS_FILE):
+        print(f"⚠️ THIẾU FILE CẤU HÌNH: Không tìm thấy file nhận diện Google '{CREDENTIALS_FILE}' tại thư mục hiện tại.")
+        print("Vui lòng copy file .json dịch vụ của Google vào thư mục này để kết nối với Google Sheet!")
+        sys.exit(1)
 
 
 def build_driver():
@@ -557,7 +560,11 @@ if __name__ == "__main__":
                         help="Chỉ đăng nhập lần đầu, lưu cookie, không đăng bài.")
     args = parser.parse_args()
 
-    if args.login_only:
+    profile_exists = os.path.isdir(PROFILE_ROOT) and len(os.listdir(PROFILE_ROOT)) > 0
+
+    if args.login_only or not profile_exists:
+        if not profile_exists:
+            print(f"Không tìm thấy dữ liệu tại {PROFILE_ROOT}, tự động chuyển sang chế độ đăng nhập lần đầu...")
         main_login_only()
     else:
         main()
